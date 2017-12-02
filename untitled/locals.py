@@ -1,0 +1,9 @@
+bgColor= (255,255,255)
+game_loop=1
+WIN_WIDTH=800
+WIN_HEIGHT=640
+resolution=tuple((800,640))
+WALL_WIDTH = 32;
+WALL_HEIGHT = 32;
+WALL_COLOR ="#FF6262"
+MOVE_SPEED=8
