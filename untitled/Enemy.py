@@ -8,8 +8,12 @@ class Enemy(GameObject):
         self.startX = x
         self.startY = y
         WIDTH = 32
+        self.life = 100
         HEIGHT = 32
         COLOR = "#E32636"
+        self.moveable=1
+        self.dead=0
+        self.disable_time=0
         sprite.Sprite.__init__(self)
         self.image = Surface((WIDTH, HEIGHT))
         self.image.fill(Color(COLOR))
@@ -34,21 +38,30 @@ class Enemy(GameObject):
                 up=1
         return left,right,up,down
     def update(self,platforms,hero):
+        if self.life <=0:
+            self.kill()
+            self.dead=1
         left, right, up, down = 0, 0, 0, 0;
-        self.active(hero)
-        #left,right,up,down=self.way(self.hero)
-        if left:
-            self.xvel = -MOVE_SPEED
-        if right:
-            self.xvel = MOVE_SPEED
-        if up:
-            self.yvel = -MOVE_SPEED
-        if down:
-            self.yvel = MOVE_SPEED
-        if not (right or left):
-            self.xvel = 0
-        if not (up or down):
-            self.yvel = 0
+        if(self.disable_time>0):
+            self.disable_time-=1
+            self.moveable=0
+        elif(self.disable_time<=0):
+            self.moveable=1
+        if(self.moveable and not self.dead):
+            self.active(hero)
+            left,right,up,down=self.way(self.hero)
+            if left:
+                self.xvel = -MOVE_SPEED
+            if right:
+                self.xvel = MOVE_SPEED
+            if up:
+                self.yvel = -MOVE_SPEED
+            if down:
+                self.yvel = MOVE_SPEED
+            if not (right or left):
+                self.xvel = 0
+            if not (up or down):
+                self.yvel = 0
         self.rect.x += self.xvel
         self.collide(self.xvel, 0, platforms)
         self.rect.y += self.yvel
@@ -70,9 +83,24 @@ class Enemy(GameObject):
     def active(self,hero):
         if(sprite.collide_rect(self.round,hero)):
             self.hero=hero
+            pass
             #print('spotted!')
-        else:
-            self.hero=0;
-
     def draw(self, screen):
         screen.blit(self.image, (self.rect.x,self.rect.y))
+    def vurnarability(self,hero):
+        if(hero.rect.x - self.rect.x>0):
+            self.moveable=0
+            self.xvel = -MOVE_SPEED * 4
+            self.disable_time = 5
+        elif (hero.rect.x - self.rect.x<0):
+            self.moveable=0
+            self.xvel = MOVE_SPEED * 4
+            self.disable_time = 5
+        if (hero.rect.y - self.rect.y>0):
+            self.moveable=0
+            self.yvel = -MOVE_SPEED * 4
+            self.disable_time = 5
+        elif (hero.rect.y - self.rect.y<0):
+            self.moveable=0
+            self.yvel = MOVE_SPEED * 4
+            self.disable_time = 5

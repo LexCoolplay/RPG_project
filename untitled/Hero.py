@@ -22,11 +22,14 @@ class Hero(GameObject):
         self.rect =Rect(x,y,WIDTH,HEIGHT)
         self.moveable=1;
         self.disable_time=0;
-        self.attack = GameObject(x, y, Surface((WIDTH +  500, HEIGHT + 500)))
-        self.attack.image.fill(Color(COLOR))
-        self.attack.rect = Rect(x-50, y-50, 500, 500)
+        self.attack_r = GameObject(x, y, Surface((WIDTH +  500, HEIGHT + 500)))
+        self.attack_r.image = Surface((WIDTH+30, HEIGHT+30))
+        self.attack_r.image.fill(Color("#123232"))
+        self.attack_r.rect = Rect(x-64, y-64, 288, 288)
     def update(self,left,right,up,down,platforms,enemies):
         #print(left,right,up,down)
+        self.attack(enemies)
+        self.vurnarability(enemies)
         if(self.moveable):
             if left:
                 self.xvel= -MOVE_SPEED
@@ -47,14 +50,15 @@ class Hero(GameObject):
         if(self.attack_cooldown>0):
             self.attack_cooldown-=1
         self.rect.x += self.xvel
-        self.attack.rect.x += self.xvel
-        self.collide(self.xvel,0,platforms,enemies)
+        self.attack_r.rect.x += self.xvel
+        self.collide(self.xvel,0,platforms)
         self.rect.y += self.yvel
-        self.attack.rect.y +=self.yvel
-        self.collide(0,self.yvel,platforms,enemies)
+        self.attack_r.rect.y +=self.yvel
+        self.collide(0,self.yvel,platforms)
     def draw(self, screen):
         screen.blit(self.image, (self.rect.x,self.rect.y))
-    def collide(self,xvel,yvel,platforms,enemies):
+        #screen.blit(self.attack_r.image, (self.rect.x,self.rect.y))
+    def collide(self,xvel,yvel,platforms):
         for p in platforms:
             if sprite.collide_rect(self,p):
                 if(xvel>0):
@@ -67,31 +71,38 @@ class Hero(GameObject):
                 if(yvel<0):
 
                     self.rect.top=p.rect.bottom
-        for e in enemies:
-            if self.attack.rect.contains(e):
-                #if (self.mouse.get_pressed()[0] == True and not self.attack_cooldown>0):
-                print('Attack!')
-                self.attack_cooldown=10
-            if (sprite.collide_rect(self,e) and self.moveable==True):
-                if(e.rect.left==self.rect.left):
-                    self.moveable=0
-                    self.xvel = -MOVE_SPEED * 2
-                    self.disable_time = 5
-                if (e.rect.right == self.rect.right):
-                    self.moveable=0
-                    self.xvel = MOVE_SPEED * 2
-                    self.disable_time = 5
-                if (e.rect.bottom == self.rect.bottom):
-                    self.moveable=0
-                    self.yvel = -MOVE_SPEED * 2
-                    self.disable_time = 5
-                if (e.rect.top == self.rect.top):
-                    self.moveable=0
-                    self.yvel = MOVE_SPEED * 2
-                    self.disable_time = 5
+
     def die(self):
         time.wait(500)
         self.teleporting(self.startX,self.startY)
     def teleporting(self,goX,goY):
         self.rect.x=goX
         self.rect.y=goY
+    def vurnarability(self,enemies):
+        for e in enemies:
+            if (sprite.collide_rect(self,e) and self.moveable==True):
+                if(e.xvel>0):
+                    self.moveable=0
+                    self.xvel = MOVE_SPEED * 2
+                    self.disable_time = 5
+                if (e.xvel<0):
+                    self.moveable=0
+                    self.xvel = -MOVE_SPEED * 2
+                    self.disable_time = 5
+                if (e.yvel<0):
+                    self.moveable=0
+                    self.yvel = -MOVE_SPEED * 2
+                    self.disable_time = 5
+                if (e.yvel>0):
+                    self.moveable=0
+                    self.yvel = MOVE_SPEED * 2
+                    self.disable_time = 5
+    def attack(self,enemies):
+        if (self.mouse.get_pressed()[0] == True and self.attack_cooldown <= 0):
+           #print('Attack!')
+           self.attack_cooldown = 10
+           for e in enemies:
+               if sprite.collide_rect(self.attack_r,e):
+                    print("hit!")
+                    e.vurnarability(self)
+                    e.life-=25

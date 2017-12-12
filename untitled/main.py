@@ -27,41 +27,41 @@ entities = pygame.sprite.Group()
 platforms= []
 level= [
     "----------------------------------------------------",
-    "-                       -                          -",
-    "-                       -                          -",
-    "-                       -                          -",
-    "-                       -                          -",
     "-                                                  -",
-    "-                                     *            -",
     "-                                                  -",
     "-                                                  -",
     "-                                                  -",
     "-                                                  -",
-    "-                       -                          -",
-    "-                       -                          -",
-    "-                       -                          -",
-    "-                       -                          -",
-    "-                       -                          -",
-    "-                       -                          -",
-    "-------------------------                          -",
-    "-                       -                          -",
-    "-                       -                          -",
-    "-                       -                          -",
-    "-                       -                          -",
-    "-                       -                          -",
-    "-                       -                          -",
-    "-                       -                          -",
-    "-                       -                          -",
-    "-                       -                          -",
-    "-                       -                          -",
-    "-                       -                          -",
-    "-                       -                          -",
-    "-                       -                          -",
-    "-                       -                          -",
-    "-                       -                          -",
-    "-                       -                          -",
-    "-                       -                          -",
-    "-                       -                          -",
+    "-                                     *            -",
+    "-                                                  -",
+    "-         -             ------------------         -",
+    "-         -             -                          -",
+    "-         -             -                          -",
+    "-         -             -                          -",
+    "-         -             -                          -",
+    "-         -             -                          -",
+    "-         -             -                          -",
+    "-         -             -                          -",
+    "-         -             -                          -",
+    "-         ---------------------------------        -",
+    "-                       -                 -        -",
+    "-                       -                 -        -",
+    "-                       -                 -        -",
+    "-                       -                 -        -",
+    "-                       -                 -        -",
+    "-                       -                 -        -",
+    "-                       -                 -        -",
+    "-                       -                 -        -",
+    "-                       -                 -        -",
+    "-        ----------------                 -        -",
+    "-                                                  -",
+    "-                                                  -",
+    "-                                                  -",
+    "-                                                  -",
+    "-                                                  -",
+    "-                                                  -",
+    "-                                                  -",
+    "-                                                  -",
     "----------------------------------------------------",
 ]
 entities.add(hero)
@@ -71,7 +71,6 @@ total_level_width = len(level[0]) * WALL_WIDTH  # Высчитываем фак�
 total_level_height = len(level) * WALL_HEIGHT  # высоту
 
 camera = Camera(camera_configure, total_level_width, total_level_height)
-
 x = y = 0;
 for row in level:
     for col in row:
@@ -120,8 +119,12 @@ while game_loop:
         screen.blit(e.image, camera.apply(e))
     for en in enemies:
         en.update(platforms,hero)
+        en.draw(screen)
+        if en.dead:
+            enemies.remove(en)
+            entities.remove(en)
     pygame.display.update()
 
 
-pygame.quit();
+pygame.quit()
 
